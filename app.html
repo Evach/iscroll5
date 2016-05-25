@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+
+<title>iScroll demo: click</title>
+<script type="text/javascript" src="iscroll-probe.js"></script>
+<script type="text/javascript" src="jquery-1.10.2.js"></script>
+<script type="text/javascript">
+$(function(){
+	var requestf5=document.getElementById("requestf5");
+	var myScroll;
+	myScroll = new IScroll('#wrapper', { 
+		mouseWheel: true,  //是否监听鼠标滚轮事件
+		bounceTime:600,	   //弹力动画持续的毫秒数
+		probeType: 3
+	});
+	var handle=0;//初始为0，无状态；1表示下拉，2表示上拉
+	myScroll.on('scroll', function(){
+		if (this.y > 5) {//下拉刷新效果 ，标识设置为1 
+			handle=1;
+			if(this.y>20){
+				requestf5.style.opacity=1;
+			}else{
+				requestf5.style.opacity=0;
+			};
+		} else if (this.y < (this.maxScrollY - 5)) {//上拉刷新效果 ，表示设置为2 
+			handle=2;
+		};		
+	}); 
+	myScroll.on('scrollEnd', function(){
+		if(handle==1){//下拉刷新处理
+			downrefresh()
+			handle=0;//重设为0，改为无状态
+		}else if(handle==2){//上拉刷新处理
+			upajaxload()			
+			handle=0;//重设为0，改为无状态
+		}else{handle=0;};		
+	}); 
+	document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
+	
+	
+	function downrefresh(){//刷新处理
+		console.log("下拉");
+		page=1;
+		myScroll.refresh();
+	};
+	
+	
+	var page=1;
+    var limit=10;
+		var jsondata=[
+        {'aa':111,'bb':111111},
+        {'aa':222,'bb':111111},
+        {'aa':333,'bb':111111},
+        {'aa':444,'bb':111111},
+        {'aa':555,'bb':111111},
+        {'aa':666,'bb':111111},
+        {'aa':777,'bb':111111},
+        {'aa':888,'bb':111111},
+        {'aa':999,'bb':111111},
+        {'aa':123,'bb':111111},
+        {'aa':456,'bb':111111},
+        {'aa':789,'bb':111111},
+        {'aa':987,'bb':111111},
+        {'aa':654,'bb':111111},
+        {'aa':321,'bb':111111},
+        {'aa':556,'bb':111111},
+        {'aa':223,'bb':111111},
+        {'aa':112,'bb':111111},
+        {'aa':889,'bb':111111},
+        {'aa':778,'bb':111111},
+        {'aa':998,'bb':111111},
+        {'aa':447,'bb':111111},
+        {'aa':852,'bb':111111},
+        {'aa':741,'bb':111111},
+        {'aa':963,'bb':111111},
+        {'aa':369,'bb':111111},
+        {'aa':258,'bb':111111},
+        {'aa':147,'bb':111111},
+        {'aa':753,'bb':111111},
+        {'aa':159,'bb':111111},
+        {'aa':999999,'bb':999999999999},
+        {'aa':999,'bb':999999},
+        {'aa':9,'bb':999999999},
+        {'aa':99,'bb':999999999}
+    ];
+	var isfirst=true;
+	function upajaxload(){//加载处理		
+		if(isfirst){
+			isfirst=false;
+			setTimeout(function(){
+				page+=1;
+				for(var i=(page-1)*limit;i<(page-1)*limit+limit;i++){
+					if(i<jsondata.length){
+						$(".demo").append('<div class="list"><p>'+jsondata[i].aa+'</p><p>'+jsondata[i].bb+'</p></div>');
+					};
+				};
+				myScroll.refresh();//刷新结构
+				isfirst=true;
+			},1000);
+		}
+	};
+		
+});
+</script>
+
+<style type="text/css">
+* {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+html {
+	-ms-touch-action: none;
+}
+
+*{
+	padding: 0;
+	margin: 0;
+	border: 0;
+}
+
+body {
+	font-size: 12px;
+	font-family: ubuntu, helvetica, arial;
+	overflow: hidden; /* this is important to prevent the whole page to bounce */
+}
+
+#header {
+	position: absolute;
+	z-index: 2;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 45px;
+	line-height: 45px;
+	background: #CD235C;
+	padding: 0;
+	color: #eee;
+	font-size: 20px;
+	text-align: center;
+	font-weight: bold;
+}
+
+#footer {
+	position: absolute;
+	z-index: 2;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	height: 48px;
+	background: #444;
+	padding: 0;
+	border-top: 1px solid #444;
+}
+
+#wrapper {
+	position: absolute;
+	z-index: 1;
+	top: 45px;
+	bottom: 48px;
+	left: 0;
+	width: 100%;
+	background: #ccc;
+	overflow: hidden;
+}
+
+#scroller {
+	position: absolute;
+	z-index: 1;
+	-webkit-tap-highlight-color: rgba(0,0,0,0);
+	width: 100%;
+	-webkit-transform: translateZ(0);
+	-moz-transform: translateZ(0);
+	-ms-transform: translateZ(0);
+	-o-transform: translateZ(0);
+	transform: translateZ(0);
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	-webkit-text-size-adjust: none;
+	-moz-text-size-adjust: none;
+	-ms-text-size-adjust: none;
+	-o-text-size-adjust: none;
+	text-size-adjust: none;
+}
+
+#requestf5{position:absolute; width:100px; height:20px; line-height:20px; text-align:center; 
+left:50%; margin-left:-50px; top:45px; z-index:2; opacity:0;}
+.demo{ background:#FFF;}
+.demo .list{ height:200px;}
+</style>
+</head>
+<body>
+<div id="header">iScroll</div>
+<div id="requestf5">请求刷新</div>
+<div id="wrapper">
+	<div id="scroller">
+		<div class="demo">
+        	<div class="list">
+            	<p>1</p>
+                <p>1111111</p>
+            </div>
+            <div class="list">
+            	<p>2</p>
+                <p>222222</p>
+            </div>
+            <div class="list">
+            	<p>1</p>
+                <p>333333</p>
+            </div>
+            <div class="list">
+            	<p>1</p>
+                <p>444444444</p>
+            </div>
+            <div class="list">
+            	<p>1</p>
+                <p>5555555555</p>
+            </div>
+            <div class="list">
+            	<p>1</p>
+                <p>666666666666</p>
+            </div>
+            <div class="list">
+            	<p>1</p>
+                <p>777777777</p>
+            </div>
+            <div class="list">
+            	<p>1</p>
+                <p>888888888</p>
+            </div>
+            <div class="list">
+            	<p>1</p>
+                <p>9998999</p>
+            </div>
+            <div class="list">
+            	<p>1</p>
+                <p>9999999999999999</p>
+            </div>
+        </div>
+	</div>
+</div>
+
+<div id="footer"></div>
+
+</body>
+</html>
